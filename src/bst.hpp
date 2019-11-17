@@ -44,8 +44,7 @@ private:
     std::vector<T> *inorderHelper(Node<T>*, std::vector<T>*);
     std::vector<T> *preorderHelper(Node<T>*, std::vector<T>*);
     std::vector<T> *postorderHelper(Node<T>*, std::vector<T>*);
-    Node<T> *removeHelper(Node<T>*, T);
-    T findMinHelperValue(Node<T>*);
+    void removeHelper(Node<T>*, T);
 };
 
 template<class T>
@@ -143,28 +142,29 @@ template<class T>
         root = tmp;
     }
     else {
-        Node<T>* current;
-        Node<T>* iterator = root;
-        while (iterator != NULL) {
-            if (new_data == iterator->get_data()) {
+        Node<T>* current = root;
+        while (current != NULL) {
+            if (new_data == current->get_data()) {
                 return;
             }
-            else if (new_data < iterator->get_data()) {
-                current = iterator;
-                iterator = iterator->get_left();
+            else if (new_data < current->get_data()) {
+                if (current->get_left() == NULL) {
+                    current->set_left(tmp);
+                } else {
+                    current = current->get_left();
+                }
             }
-            else if (new_data > iterator->get_data()) {
-                current = iterator;
-                iterator = iterator->get_right();
+            else if (new_data > current->get_data()) {
+                if (current->get_right() == NULL) {
+                    current->set_right(tmp);
+                } else {
+                    current = current->get_right();
+                }
             }
         }
 
-        if (new_data < current->get_data()) {
-            current->set_left(tmp);
-        }
-        else {
-            current->set_right(tmp);
-        }
+        current->set_left(NULL);
+        current->set_right(NULL);
 
         node_count++;
     }
@@ -204,53 +204,68 @@ template<class T>
 }
 
 template<class T>
- Node<T> * BST<T>::removeHelper(Node<T> *node, T val)
+ void BST<T>::removeHelper(Node<T> *node, T val)
 {
-    if (node == NULL) {
-        return node;
-    }
-    if (val < node->get_data()) {
-        node->set_left(removeHelper(node->get_left(), val));
-    }
-    else if (val > node->get_data()) {
-        node->set_right(removeHelper(node->get_right(), val));
-    }
-    else {
-        if (node->get_left() == NULL && node->get_right() == NULL) {
-            delete(node);
-            node = NULL;
-        }
-        else if (node->get_left() == NULL) {
-            Node<T>* temp = node;
-            node = node->get_right();
-            delete(temp);
-        }
-        else if (node->get_right() == NULL) {
-            Node<T>* temp = node;
-            node = node->get_left();
-            delete(temp);
-        }
-        else {
-            T minValue = findMinHelperValue(node->get_right());
-
-            node->set_data(minValue);
-
-            node->set_right(removeHelper(node->get_right(), minValue));
-        }
-    }
-    return node;
-}
-
-template<class T>
- T BST<T>::findMinHelperValue(Node<T> *node)
-{
+    Node<T>* par = NULL;
     Node<T>* current = node;
 
-    if (current->get_left() != NULL) {
-        return findMinHelperValue(current->get_left());
+    while (current != NULL) {
+        if (val == current->get_data()) {
+            if (current->get_left() == NULL && current->get_right() == NULL) {
+                if (par == NULL) {
+                    node = NULL;
+                }
+                else if (par->get_left() == current) {
+                    par->set_left(NULL);
+                }
+                else {
+                    par->set_right(NULL);
+                }
+            }
+            else if (current->get_left() != NULL && current->get_right() == NULL) {
+                if (par == NULL) {
+                    node = current->get_left();
+                }
+                else if (par->get_left() == current) {
+                    par->set_left(current->get_left());
+                }
+                else {
+                    par->set_right(current->get_left());
+                }
+            }
+            else if (current->get_left() == NULL && current->get_right() != NULL) {
+                if (par == NULL) {
+                    node = current->get_right();
+                }
+                else if (par->get_left() == current) {
+                    par->set_left(current->get_right());
+                }
+                else {
+                    par->set_right(current->get_right());
+                }
+            }
+            else {
+                Node<T>* suc = current->get_right();
+                while (suc->get_left() != NULL) {
+                    suc = suc->get_left();
+                }
+                T sucData = suc->get_data();
+                removeHelper(root, sucData);
+                current->set_data(sucData);
+            }
+            node_count--;
+            return;
+        }
+        else if (current->get_data() < val) {
+            par = current;
+            current = current->get_right();
+        }
+        else {
+            par = current;
+            current = current->get_left();
+        }
     }
-
-    return current->get_data();
+    return;
 }
 
 template<class T>
