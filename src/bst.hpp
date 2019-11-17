@@ -31,7 +31,7 @@ public:
     // Searches the tree for a given value
     // param: the data to search for
     // returns: a pointer to the node containing the data or NULL if the data
-    //          was not found
+    // was not found
     Node<T> *search(T);
     // Gets the current number of nodes in the tree
     // returns: the number of nodes in the tree
@@ -80,8 +80,8 @@ template<class T>
     }
 
     inorderHelper(node->get_left(), vec);
-	(*vec).push_back(node->get_data());
-	inorderHelper(node->get_right(), vec);
+    (*vec).push_back(node->get_data());
+    inorderHelper(node->get_right(), vec);
 
     return vec;
 }
@@ -104,7 +104,7 @@ template<class T>
 
     (*vec).push_back(node->get_data());
     preorderHelper(node->get_left(), vec);
-	preorderHelper(node->get_right(), vec);
+    preorderHelper(node->get_right(), vec);
 
     return vec;
 }
@@ -124,9 +124,9 @@ template<class T>
     if (node == NULL) {
         return NULL;
     }
-
+    
     postorderHelper(node->get_left(), vec);
-	postorderHelper(node->get_right(), vec);
+    postorderHelper(node->get_right(), vec);
     (*vec).push_back(node->get_data());
 
     return vec;
@@ -138,8 +138,8 @@ void BST<T>::insert(T new_data)
     Node<T>* tmp = new Node<T>(new_data);
 
     if(root == NULL) {
-		root = tmp;
-	} else {
+        root = tmp;
+    } else {
         Node<T>* current;
         Node<T>* iterator = root;
         while (iterator != NULL) {
@@ -203,3 +203,4 @@ int BST<T>::get_size()
 {
     return node_count;
 }
+
