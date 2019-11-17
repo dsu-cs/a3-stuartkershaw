@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iostream>
 #include "node.hpp"
+using namespace std;
 
 template<class T>
 class BST{
@@ -40,6 +41,9 @@ private:
     Node<T> *root;
     // the number of nodes in the tree
     int node_count;
+    std::vector<T> *inorderHelper(Node<T>*, std::vector<T>*);
+    std::vector<T> *preorderHelper(Node<T>*, std::vector<T>*);
+    std::vector<T> *postorderHelper(Node<T>*, std::vector<T>*);
 };
 
 template<class T>
@@ -62,24 +66,68 @@ BST<T>::~BST()
 template<class T>
  std::vector<T> * BST<T>::inorder()
 {
-    std::vector<T> *vec = new std::vector<T>;
+    Node<T>* iterator = root;
+    std::vector<T>* vec = new std::vector<T>;
+
+    return inorderHelper(iterator, vec);
+}
+
+template<class T>
+ std::vector<T> * BST<T>::inorderHelper(Node<T> *node, std::vector<T> *vec)
+{
+    if (node == NULL) {
+        return NULL;
+    }
+
+    inorderHelper(node->get_left(), vec);
+	(*vec).push_back(node->get_data());
+	inorderHelper(node->get_right(), vec);
 
     return vec;
 }
-
 
 template<class T>
  std::vector<T> * BST<T>::preorder()
 {
-    std::vector<T> *vec = new std::vector<T>;
-    return vec;
+    Node<T>* iterator = root;
+    std::vector<T>* vec = new std::vector<T>;
+
+    return preorderHelper(iterator, vec);
 }
 
+template<class T>
+ std::vector<T> * BST<T>::preorderHelper(Node<T> *node, std::vector<T> *vec)
+{
+    if (node == NULL) {
+        return NULL;
+    }
+
+    (*vec).push_back(node->get_data());
+    preorderHelper(node->get_left(), vec);
+	preorderHelper(node->get_right(), vec);
+
+    return vec;
+}
 
 template<class T>
  std::vector<T> * BST<T>::postorder()
 {
-    std::vector<T> *vec = new std::vector<T>;
+    Node<T>* iterator = root;
+    std::vector<T>* vec = new std::vector<T>;
+
+    return postorderHelper(iterator, vec);
+}
+
+template<class T>
+ std::vector<T> * BST<T>::postorderHelper(Node<T> *node, std::vector<T> *vec)
+{
+    if (node == NULL) {
+        return NULL;
+    }
+
+    postorderHelper(node->get_left(), vec);
+	postorderHelper(node->get_right(), vec);
+    (*vec).push_back(node->get_data());
 
     return vec;
 }
@@ -87,28 +135,71 @@ template<class T>
 template<class T>
 void BST<T>::insert(T new_data)
 {
+    Node<T>* tmp = new Node<T>(new_data);
 
+    if(root == NULL) {
+		root = tmp;
+	} else {
+        Node<T>* current;
+        Node<T>* iterator = root;
+        while (iterator != NULL) {
+            if (new_data == iterator->get_data()) {
+                return;
+            }
+            else if (new_data < iterator->get_data()) {
+                current = iterator;
+                iterator = iterator->get_left();
+            }
+            else if (new_data > iterator->get_data()) {
+                current = iterator;
+                iterator = iterator->get_right();
+            }
+        }
+
+        if (new_data < current->get_data()) {
+            current->set_left(tmp);
+        } else {
+            current->set_right(tmp);
+        }
+
+        node_count++;
+    }
 }
-
 
 template<class T>
 Node<T> *BST<T>::search(T val)
 {
+    Node<T>* current;
+    Node<T>* iterator = root;
+    while (iterator != NULL) {
+        if (val == iterator->get_data()) {
+            return iterator;
+        }
+        else if (val < iterator->get_data()) {
+            current = iterator;
+            iterator = iterator->get_left();
+        }
+        else if (val > iterator->get_data()) {
+            current = iterator;
+            iterator = iterator->get_right();
+        }
+    }
 
+    if (val == current->get_data()) {
+        return current;
+    } else {
+        return NULL;
+    }
 }
-
-
 
 template<class T>
 void BST<T>::remove(T val)
 {
-
+    Node<T>* toRemove = search(val);
 }
-
-
 
 template<class T>
 int BST<T>::get_size()
 {
-
+    return node_count;
 }
